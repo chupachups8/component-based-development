@@ -1,0 +1,17 @@
+Docker Hub images:
+
+https://hub.docker.com/r/nikk88/cinema-movie-service
+https://hub.docker.com/r/nikk88/cinema-reservation-service
+https://hub.docker.com/r/nikk88/cinema-payment-service
+https://hub.docker.com/r/nikk88/cinema-api-gateway
+https://hub.docker.com/r/nikk88/cinema-naming-server
+https://hub.docker.com/r/nikk88/cinema-config-server
+
+Image tags:
+
+nikk88/cinema-movie-service:1.0
+nikk88/cinema-reservation-service:1.0
+nikk88/cinema-payment-service:1.0
+nikk88/cinema-api-gateway:1.0
+nikk88/cinema-naming-server:1.0
+nikk88/cinema-config-server:1.0

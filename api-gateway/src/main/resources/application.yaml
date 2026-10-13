@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: api-gateway
+
+  config:
+    import: "configserver:"
+
+  main:
+    web-application-type: reactive
+
+jwt:
+  secret: cinema-gateway-super-secret-key-2026-1234567890

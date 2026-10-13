@@ -1,0 +1,17 @@
+
+spring:
+  application:
+    name: reservation-service
+
+  config:
+    import: "configserver:"
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/cinema_reservation_db
+    username: root
+    password: 121516Nz.
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true

@@ -1,0 +1,130 @@
+services:
+
+  movie-db:
+    image: mysql:8.4
+    container_name: movie-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: cinema_movie_db
+    ports:
+      - "3307:3306"
+    volumes:
+      - movie-db-data:/var/lib/mysql
+
+  reservation-db:
+    image: mysql:8.4
+    container_name: reservation-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: cinema_reservation_db
+    ports:
+      - "3308:3306"
+    volumes:
+      - reservation-db-data:/var/lib/mysql
+
+  payment-db:
+    image: mysql:8.4
+    container_name: payment-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: cinema_payment_db
+    ports:
+      - "3309:3306"
+    volumes:
+      - payment-db-data:/var/lib/mysql
+
+  naming-server:
+    image: nikk88/cinema-naming-server:1.0
+    container_name: naming-server
+    ports:
+      - "8761:8761"
+
+  config-server:
+    image: nikk88/cinema-config-server:1.0
+    container_name: config-server
+    ports:
+      - "8888:8888"
+    depends_on:
+      - naming-server
+
+  movie-service:
+    image: nikk88/cinema-movie-service:1.0
+    container_name: movie-service
+    restart: on-failure
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+      SPRING_DATASOURCE_URL: jdbc:mysql://movie-db:3306/cinema_movie_db
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://naming-server:8761/eureka/
+      EUREKA_INSTANCE_HOSTNAME: movie-service
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "false"
+    depends_on:
+      - movie-db
+      - naming-server
+      - config-server
+
+  reservation-service:
+    image: nikk88/cinema-reservation-service:1.0
+    container_name: reservation-service
+    restart: on-failure
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+      SPRING_DATASOURCE_URL: jdbc:mysql://reservation-db:3306/cinema_reservation_db
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://naming-server:8761/eureka/
+      EUREKA_INSTANCE_HOSTNAME: reservation-service
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "false"
+    depends_on:
+      - reservation-db
+      - naming-server
+      - config-server
+      - movie-service
+
+  payment-service:
+    image: nikk88/cinema-payment-service:1.0
+    container_name: payment-service
+    restart: on-failure
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+      SPRING_DATASOURCE_URL: jdbc:mysql://payment-db:3306/cinema_payment_db
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://naming-server:8761/eureka/
+      EUREKA_INSTANCE_HOSTNAME: payment-service
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "false"
+    depends_on:
+      - payment-db
+      - naming-server
+      - config-server
+      - reservation-service
+
+  api-gateway:
+    image: nikk88/cinema-api-gateway:1.0
+    container_name: api-gateway
+    restart: on-failure
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://naming-server:8761/eureka/
+      EUREKA_INSTANCE_HOSTNAME: api-gateway
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "false"
+    depends_on:
+      - naming-server
+      - config-server
+      - movie-service
+      - reservation-service
+      - payment-service
+
+volumes:
+  movie-db-data:
+  reservation-db-data:
+  payment-db-data:
